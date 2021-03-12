@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, redirect, url_for
+from flask import Flask, render_template
 from flask_bootstrap import Bootstrap
 from flask_wtf import FlaskForm
 from wtforms import StringField, IntegerField, SubmitField, DateField
@@ -9,12 +9,13 @@ from flask_sqlalchemy import SQLAlchemy
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'data.sqlite')
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = 'hard to guess secret key'
-app.config['EXPLAIN_TEMPLATE_LOADING'] = True
 
 bootstrap = Bootstrap(app)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'data.sqlite')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.cofig['SECRET_KEY'] = 'hard to guess secret key'
+
 db = SQLAlchemy(app)
 
 @app.errorhandler(404)
@@ -29,8 +30,7 @@ def internal_server_error(e):
 
 @app.route('/')
 def index():
-    form = ArticleForm()
-    return render_template('index.html', form=form)
+    return render_template('index.html')
 
 
 @app.route('/user/<name>')
@@ -57,24 +57,16 @@ class Article(db.Model):
         return f"{self.title} publicado en  {self.source}"
 
 class ArticleForm(FlaskForm):
-    title = StringField('News article title: ', validators=[DataRequired()])
+    title = StringField('News artcile title: ', validators=[DataRequired()])
     rating = IntegerField('News sentiment rating: ', validators=[DataRequired()])
+    source = StringField('News channel: ', validators=[DataRequired()])
+    url = StringField('News web link: ', validators=[URL()])
+    date = DateField('News web link: ')
+    length = IntegerField('Length of the news article in words: ')
+    countries = StringField('Countries involved: ')
     submit =SubmitField('Submit')
     
 @app.route('/articles', methods=['GET'])
 def articles():
     articles = Article.query.all()
     return render_template('articles.html', articles=articles)
-
-
-@app.route('/addarticle', methods=['GET', 'POST'])
-def addarticle():
-    form = ArticleForm()
-    if form.validate_on_submit():
-        db.session.add(ArticleForm.title)
-        db.session.add(ArticleForm.rating)
-        db.session.commit()
-        return redirect(url_for('addarticle'))
-    return render_template('addarticle.html', form=form)
-
-
