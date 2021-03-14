@@ -18,3 +18,9 @@ def user(name):
     else:
         return render_template('user.html', name=name.title())
 
+
+@app.route('/country/<name>')
+def country(name):
+    country = Country.query.filter_by(name=name).first()
+    articles = Article.query.filter(Article.countries.contains(country)).all()
+    return render_template('country.html', country=country, articles=articles)
