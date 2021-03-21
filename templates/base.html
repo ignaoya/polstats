@@ -18,11 +18,13 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="/">Flasky</a>
+            <a class="navbar-brand" href="/">Polstats</a>
         </div>
         <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
                 <li><a href="/">Home</a></li>
+                <li><a href="/add_article">Add Article</a></li>
+                <li><a href="/view_articles">View Articles</a></li>
             </ul>
         </div>
     </div>
@@ -31,6 +33,14 @@
 
 {% block content %}
 <div class="container">
+    {% for message in get_flashed_messages()%}
+    <div class="alert alert-warning">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        {{ message }}
+    </div>
+    {% endfor %}
+    
     {% block page_content %}{% endblock %}
+
 </div>
 {% endblock %}
